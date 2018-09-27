@@ -22,6 +22,13 @@ DESIGN/GAME PLAN
 			simpleCSVsort.h
 				define macros (STDIN, STDOUT, STDERR, etc...)
 				define struct "record" corresponding to each row of the CSV
+					 - struct
+						- three fields: void * key, char * [200?] full_record, record * next
+						- key will hold the value to be sorted on
+						- full_record will hold the entire record, formatted as in input file
+						- record * next will be used to connect all records in a linked list
+				define struct "node"
+					- node will have two fields: struct record and 
 				include libraries (mergesort.c)
 				printCSV( ) function ??
 				ETC ... ?
@@ -56,6 +63,5 @@ DESIGN/GAME PLAN
 
 	mergesort.c
 		- mergesort()
-			- no idea how to implement this yet... 
-			- TO BE CONTINUED
+			sort on the linked list of records.
 

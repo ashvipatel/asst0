@@ -55,30 +55,30 @@ DESIGN/GAME PLAN
 
 		struct record { void* key, entire_record_formatted, record * next }
 
-		int readCSV( STDIN, record* head, char* key_type )
+		int readCSV( STDIN, list_of_records* head, char* key_type )
 			reads the CSV file from STDIN and builds a LinkedLisk of records: one record per line
 			returns 1 if successful
 			else write to STDERR and return 0 
 
-		int writetoSTDOUT( record* head )
+		int writetoSTDOUT(list_of_records* head )
 			head pointed to a linked list which represents a CSV
 			writes the CSV to STDOUT
 			returns 1 if successful
 			else returns 0
 
-		int writeCSV( char* file_name, record* head )
+		int writeCSV( char* file_name, list_of_records* head )
 			writes the CSV to file file_name in the current working directory
 			returns 1 if successful
 			else returns 0
 
-		int clear_LL( record* head)
+		int clear_LL(list_of_records* head)
 			frees memory allocated for linked list pointed to by head
 			returns 1 is successful
 			else returns 0
 
 	mergesort.h
 
-		int mergesort(record*)
+		int mergesort(list_of_records*)
 			driver function for merge sort
 			returns 1 on success
 			else returns 0

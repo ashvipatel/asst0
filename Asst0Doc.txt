@@ -7,55 +7,94 @@ DESIGN/GAME PLAN
 	
 		Asst0Doc.tx
 
-		data/
-			test input CSV file(s)
-			test output CVS file(s)
+		test input CSV file(s)
+		test output CVS file(s)
 
 		Makefile
 
-		source/
-			simpleCSVsort.c
-				include libraries and header file
-				main function
-				ETC ... ?
 
-			simpleCSVsort.h
-				define macros (STDIN, STDOUT, STDERR, etc...)
-				define struct "record" corresponding to each row of the CSV
-				include libraries (mergesort.c)
-				printCSV( ) function ??
-				ETC ... ?
+		simpleCSVsort.c
+			include libraries and header file
+			main function
+			ETC ... ?
 
-			mergesort.c
-				mergesort aort function
-					attempt to make it protable w/ function pointers?
+		simpleCSVsort.h
+			define macros (STDIN, STDOUT, STDERR, etc...)
+			define struct "record" corresponding to each row of the CSV
+			include libraries (mergesort.c)
+			printCSV( ) function ??
+			ETC ... ?
+
+		mergesort.c
+			mergesort aort function
+				attempt to make it protable w/ function pointers?
+
 
 	simpleCSVsort.c
-	 - main()
-		- error check commnd line arguments
-			- set stderr appropriately and exit if arguments incorrect/!match
-		- make character buffer (size 20 or 30 ?) 
-			- is it better to have an oversized buffer and not realloc mid comma?
-		- read input one char at a time
-			if ( ch != ',' )
-				transfer buffer to record, clear buffer, continue
-			else if ( ch is invalid )
-				exit on stderr
-			else
-				add ch to buffer, continue
-		- build linked list of records	
-		- call mergesort() on the linked list of records
-		- call printCSV() on the sorted list of records
+
+		main()
+			error check commnd line arguments
+				set stderr appropriately and exit if arguments incorrect || !match
+				else continue
+
+			set char* key_type <-- argv[2]
+			init record* head
+
+			call readCSV()
+			call mergesort()
+			call printCSV()
+			call clearCSV()
 
 	simpleCSVsort.h
+
 		#define STDIN 0
 		#define STDOUT 1
 		#define STDERR 2
-		- printfCSV()
-			- TO BE CONTINUED
+
+		struct record { void* key, entire_record_formatted, record * next }
+
+		int readCSV( STDIN, record* head, char* key_type )
+			reads the CSV file from STDIN and builds a LinkedLisk of records: one record per line
+			returns 1 if successful
+			else write to STDERR and return 0 
+
+		int writetoSTDOUT( record* head )
+			head pointed to a linked list which represents a CSV
+			writes the CSV to STDOUT
+			returns 1 if successful
+			else returns 0
+
+		int writeCSV( char* file_name, record* head )
+			writes the CSV to file file_name in the current working directory
+			returns 1 if successful
+			else returns 0
+
+		int clear_LL( record* head)
+			frees memory allocated for linked list pointed to by head
+			returns 1 is successful
+			else returns 0
 
 	mergesort.c
-		- mergesort()
-			- no idea how to implement this yet... 
-			- TO BE CONTINUED
+
+		mergesort()
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

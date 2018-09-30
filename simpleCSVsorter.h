@@ -19,11 +19,12 @@ typedef struct _Record
 	struct _Record* next;
 } Record;
 
-typedef struct _list_of_records
+typedef struct _record_list
 {
+	char* key_type;
 	char* col_values;
 	Record* first;
-} list_of_records;
+} record_list;
 
 
 
@@ -32,7 +33,6 @@ typedef struct _list_of_records
 *	Define Global Variables, MACROS, and File Descriptors
 *
 ******/
-char* key_type;
 
 boolean integer = FALSE;
 boolean string = FALSE;
@@ -49,96 +49,69 @@ boolean floating = FALSE;
  * 	Function Prototypes
  *
  ******/
-void append(list_of_records*, void*, char*);
-//int clear(Record*);
-//int readCSV( STDIN, Record*, char*):
-void print_to_stdout(list_of_records*);
-//int write_to_file(<file descriptor?>, Record*);
-
+void push(record_list**, void*, size_t);
+void print_list(record_list*, void(*fptr)(void*));
 
 
 /******
- *
  * 	Functions
- *
- ******/
+ *****/
+
 
 /* ***
- * 	appends "key" to the end of the linked list beginning at "head"
- ****/
-void append(list_of_records* head, void* k, char* comp)
+ * 	push() pushes data "k"--in a new Record node--to the front of
+ * 	the record_list referenced by head_ref
+ ***/
+void push(record_list** head_ref, void* k, size_t data_size)
 {
-printf("------ append ------\n");
-	// cast type of key before appending to list
-	/*if(integer == TRUE)
-	{
-		k = (int*)k;
-	}
-	else if(floating == TRUE)
-		k = (float*)k;
-	else
-		k = (char*)k;
-*/
-	// if list is empty, initialize first node
-	if(head->first == NULL)
-	{
-		Record* newNode = (Record*)malloc(sizeof(Record));
+	Record* new_node = (Record*)malloc(sizeof(Record));
+	new_node->key = malloc(data_size);
+	new_node->key = k;
+	new_node->next = (*head_ref)->first;
 
-		if(integer==TRUE)
-			newNode->key = (int*)k;
-		else if(floating == TRUE)
-			newNode->key = (float*)k;
-		else
-			newNode->key = (char*)k;
+	(*head_ref)->first = new_node;
+}
 
-		newNode->complete = comp;
-		head->first = newNode;
-		return;
-	}
-
-	// head->first has been initialized
-	Record* tmp = head->first;
-	
-	while(tmp->next != NULL)
+/* ***
+ * 	print_list() accepts a pointer to a record_list as first arg.
+ * 	as second arg accepts one of the following:
+ * 		"print_int" if your list contains integer values in key
+ * 		"print_float" if your list contains float values in key
+ * 		"print_str" if your list containt char* values in key
+ * **/
+void print_list(record_list* head_ref, void(*fptr)(void*))
+{
+	Record* ptr = head_ref->first;
+	while(ptr)
 	{
-		printf("tmp = %s -- ", tmp->complete);
-		tmp = tmp->next;
+		(*fptr)(ptr->key);
+		ptr = ptr->next;
 	}
 	printf("\n");
-	// allocte mem for new node. insert appropriately casted k
-	Record* newNode = (Record*)malloc(sizeof(Record));
-	if(integer==TRUE)
-		newNode->key = (int*)k;
-	else if(floating == TRUE)
-		newNode->key = (float*)k;
-	else
-		newNode->key = (char*)k;
-	// append new node to list
-	newNode->complete = comp;
-	//newNode->next = NULL;
-	tmp->next = newNode;
+}
+void print_int(void* k)
+{
+	printf("%d ", *(int*)k);
+}
+void print_float(void* k)
+{
+	printf("%f ", *(float*)k);
+}
+void print_str(void* k)
+{
+	//char tmp[20];
+	//strcpy(tmp, (char*)k);
+	printf("%s ", (char*)k);
 }
 
 
 
 
-/* *** 					THIS FUNCTION IS TEMPORARY, TO TEST APPEND()
- * 	write the CSV to STDOUT
- ****/
-void print_to_stdout(list_of_records* head)
-{
-	if(head != NULL)
-		printf("%s\n", head->col_values);
-	else
-		printf("whoops\n");
-	Record* tmp = head->first;
-	while(tmp != NULL)
-	{
-		printf("%s -->", tmp->complete);
-		tmp = tmp->next;
-	}
-	printf("\n");
-}
+
+
+
+
+
 
 
 

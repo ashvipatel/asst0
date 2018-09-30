@@ -63,22 +63,41 @@ void print_to_stdout(list_of_records*);
  *
  ******/
 
+/*
+void append_int(list_of_records* head, int* k, char* comp)
+{
+	// build new node
+	Record* newNode = (Record*)malloc(sizeof(Record));
+	newNode->key = k;
+	newNode->complete = comp;
+
+	if(head->first == NULL)
+	{
+		head->first = newNode;
+		printf("head: %d --> ", *(int*)(head->first->key));
+		return;
+	}
+	Record* tmp = head->first;
+	while(tmp->next != NULL)
+	{
+		printf("tmp: %d --> ", *(int*)(tmp->key));
+		tmp = tmp->next;
+	}
+	// tmp = last node in list, tmp->next == NULL
+	tmp = newNode;
+	printf("newNode: %d\n", *(int*)(tmp->key));
+	return;
+}
+
+*/
+
+
 /* ***
  * 	appends "key" to the end of the linked list beginning at "head"
  ****/
 void append(list_of_records* head, void* k, char* comp)
 {
 printf("------ append ------\n");
-	// cast type of key before appending to list
-	/*if(integer == TRUE)
-	{
-		k = (int*)k;
-	}
-	else if(floating == TRUE)
-		k = (float*)k;
-	else
-		k = (char*)k;
-*/
 	// if list is empty, initialize first node
 	if(head->first == NULL)
 	{
@@ -134,7 +153,12 @@ void print_to_stdout(list_of_records* head)
 	Record* tmp = head->first;
 	while(tmp != NULL)
 	{
-		printf("%s -->", tmp->complete);
+		if(integer == TRUE)
+			printf("%d --> ", *(int*)tmp->key);
+		else if(floating == TRUE)
+			printf("%f --> ", *(float*)tmp->key);
+		else
+			printf("%s -->", *(char*)tmp->key);
 		tmp = tmp->next;
 	}
 	printf("\n");

@@ -24,7 +24,20 @@ int main(int argc, char** argv)
 	*/
 
 	// TESTING APPEND AND PRINT TO STDOUT
-	
+	int a = 8;
+	void* ptr = &a;
+	char* buff = "this is a comma separated value";
+
+	//print_to_stdout(head);
+	append(head, ptr, buff); 
+	//print_to_stdout(head);
+	append(head, ptr, buff); 
+	//print_to_stdout(head);
+	append(head, ptr, buff); 
+	//print_to_stdout(head);
+	append(head, ptr, buff); 
+	print_to_stdout(head);
+
 	free(head);
 	
 	return 1;

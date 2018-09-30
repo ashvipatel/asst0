@@ -25,6 +25,7 @@ int main(int argc, char** argv)
 <<<<<<< HEAD
 
 	// TESTING APPEND AND PRINT TO STDOUT
+<<<<<<< HEAD
 	int a = 8;
 	void* ptr = &a;
 	char* buff = "this is a comma separated value";
@@ -49,6 +50,9 @@ int main(int argc, char** argv)
 	printf("created an integer linked list...\n");
 	print_list(head, print_int);
 >>>>>>> from_scratch
+=======
+	
+>>>>>>> parent of 4cc78f4... new branch from_scratch
 	free(head);
 
 	record_list* new_head = (record_list*)malloc(sizeof(record_list));

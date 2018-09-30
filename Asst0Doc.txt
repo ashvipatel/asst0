@@ -76,9 +76,17 @@ DESIGN/GAME PLAN
 			returns 1 is successful
 			else returns 0
 
-	mergesort.c
+	mergesort.h
 
-		mergesort()
+		int mergesort(record*)
+			driver function for merge sort
+			returns 1 on success
+			else returns 0
+
+		int partition( ... )
+		
+
+		int merge( ... )
 		
 
 

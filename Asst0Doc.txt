@@ -51,6 +51,8 @@ DESIGN/GAME PLAN
 		#define STDOUT 1
 		#define STDERR 2
 
+		typedef enum _boolean { TRUE = 1, FLASE = 0} boolean;
+
 		struct record { void* key, entire_record_formatted, record * next }
 
 		int readCSV( STDIN, record* head, char* key_type )

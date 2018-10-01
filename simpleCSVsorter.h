@@ -14,7 +14,7 @@
  * 	Define custom types and structs
  *
  *****/
-typedef enum _boolean { TRUE = 1, FALSE = 2} boolean;
+typedef enum _boolean { TRUE = 1, FALSE = 0} boolean;
 
 typedef struct _Record
 {
@@ -25,7 +25,7 @@ typedef struct _Record
 
 typedef struct _record_list
 {
-	char* col_values;
+	char* col_tokens;
 	Record* first;
 } record_list;
 
@@ -37,16 +37,21 @@ typedef struct _record_list
 *
 ******/
 
-char* key_type;
-#define IS_INT = 0
-#define IS_FLOAT = 1
-#define IS_STRING = 2
-
+// variables to use in tools to determine type of data 
+// pointed to by a void*
+char* sort_token;
+int sort_token_index = 0;
+#define IS_INT 0
+#define IS_FLOAT 1
+#define IS_STRING 2
 boolean integer = FALSE;
 boolean string = FALSE;
 boolean floating = FALSE;
-
-
+// self-explanatory
+int BUFFER_SIZE = 500;
+int LINE_SIZE = 1024;
+int TOKEN_SIZE = 200;
+// file descriptors
 #define STDIN 0
 #define STDOUT 1
 #define STDERR 2
@@ -57,37 +62,137 @@ boolean floating = FALSE;
  * 	Function Prototypes
  *
  ******/
+void clear(record_list*);
+int get_token_index(char*);
 int get_type(void*);
-void push(record_list**, void*, size_t);
+void push_record(record_list**, void*, size_t);
+void print_float(void*);
+void print_int(void*);
 void print_keys(record_list*, void(*fptr)(void*));
+void print_str(void*);
+int readCSV(record_list**);
 
 
 /******
  * 	Functions
  *****/
 
-// TEST READ FROM STDIN AND WRITE TO STDOUT
-void readCSV()
+
+void clear(record_list* head_ref)
 {
-	char* buffer = (char*)malloc(500);
-	if(buffer == NULL)
-	{
-		printf("PANIC!\n");
-		return;
+//	Record* curr = head_ref->first;
+//	Record* prev = curr;
+	// free head and its contents
+	free(head_ref->col_tokens);
+	free(head_ref);
+	// iterate through list and free each record node's contents
+	// then free the record node
+}
+
+/* ***
+ *	get_key(char* str) parses through the string....
+ *	DO I NEED THIS?
+ ****/
+
+
+/* ***
+ *	get_token_index(char*) utilizes strtok() to parse the given string
+ *	and split it up into tokens, between the hard-coded delimeter: ","
+ *	RETURNS:the index of the sort token if found in the first line of the
+ *	CSV, else returns -1
+ ****/
+int get_token_index(char* a)
+{
+	int index = 0;
+	char* delim = ",";
+	char* str = (char*)malloc(LINE_SIZE);
+	char* tok;
+	str = strcpy(str, a);
+	// first call of strtok on str. returns first token of str 
+	// before delimiter: ','
+	tok = strtok(str, delim);
+	if(strcmp(tok, sort_token) == 0)
+	{ // FOUND TOKEN! Return index (should be 0)
+		free(str);
+		return index;
 	}
+	else // increment index and constinue parsing
+	{
+		index++;
+	}
+	do
+	{
+		tok = strtok(NULL, delim);
+		if(tok == NULL)
+		{
+			return -1;
+		}
+		// compare token to sort_token
+		if(strcmp(tok, sort_token) == 0)
+		{ // FOUND TOKEN! Return index
+			free(str);
+			return index;
+		}
+		else // continue parsing for next token
+		{
+			index++;
+		}
+	} while(tok);
+	return -1;
+}
+int readCSV(record_list** head_ref)
+{
+	char* buffer = (char*)malloc(BUFFER_SIZE);
+	(*head_ref)->col_tokens = (char*)malloc(LINE_SIZE);
+	int line_len = strlen((*head_ref)->col_tokens);
+		if(buffer == NULL)
+	{
+		printf("Fatal Error in %s on line %d\nUnable to Allocate Memory for Buffer\n", __FILE__, __LINE__);
+		return -1;
+	}
+
 	int count_lines = 0;
+	// read first line of CSV to get column tokens
+	do
+	{
+		read(STDIN, buffer, 1);
+		if(line_len < LINE_SIZE)
+		{
+			// append buffer to col_tokens
+			(*head_ref)->col_tokens = strcat((*head_ref)->col_tokens, buffer);
+			line_len++;
+		}
+		else // line_len exceeds memory allocateed for line
+		{
+			LINE_SIZE += (LINE_SIZE/2);
+			(*head_ref)->col_tokens = (char*)realloc((*head_ref)->col_tokens, LINE_SIZE);
+			// append buffer to col_tokens
+			(*head_ref)->col_tokens = strcat((*head_ref)->col_tokens, buffer);
+			line_len++;
+		}
+	}
+	while(strcmp(buffer, "\n") != 0);
+	count_lines++;
+	// get the token index to fetch keys for each record upon reading new line
+	sort_token_index = get_token_index((*head_ref)->col_tokens);
+	if(sort_token_index == -1)
+	{
+		printf("Fatal Error in %s on line %d\nSort Token not found in CSV\n", __FILE__, __LINE__);
+		return -1;
+	}
+	else
 	while(read(STDIN, buffer, 1) != 0)
         {
 		if(strcmp(buffer, "\n") == 0)
 			count_lines++;
 		else
 			continue;
-                //write(STDOUT, buffer, 1);
         }
 	printf("number of lines in CSV: %d\n", count_lines);
         free(buffer);
-	return;
+	return 1;
 }
+
 
 /* ***
  * 	get_type deciphers the type which is pointed to by void* n
@@ -101,12 +206,13 @@ int get_type(void* n)
 }
 
 /* ***
- * 	push() pushes data "k"--in a new Record node--to the front of
+ * 	push_record() pushes data "k"--in a new Record node--to the front of
  * 	the record_list referenced by head_ref
  ***/
-void push(record_list** head_ref, void* k, size_t data_size)
+void push_record(record_list** head_ref, void* k, size_t data_size)
 {
 	Record* new_node = (Record*)malloc(sizeof(Record));
+	// note to self: DON'T FORGET TO FREE THE KEY FOR EACH RECORD NODE
 	new_node->key = malloc(data_size);
 	new_node->key = k;
 	new_node->next = (*head_ref)->first;

@@ -21,7 +21,6 @@ typedef struct _Record
 
 typedef struct _record_list
 {
-	char* key_type;
 	char* col_values;
 	Record* first;
 } record_list;
@@ -34,14 +33,19 @@ typedef struct _record_list
 *
 ******/
 
+char* key_type;
+#define IS_INT = 0
+#define IS_FLOAT = 1
+#define IS_STRING = 2
+
 boolean integer = FALSE;
 boolean string = FALSE;
 boolean floating = FALSE;
 
+
 #define STDIN 0
 #define STDOUT 1
 #define STDERR 2
-
 
 
 /******
@@ -49,14 +53,26 @@ boolean floating = FALSE;
  * 	Function Prototypes
  *
  ******/
+int get_type(void*);
 void push(record_list**, void*, size_t);
-void print_list(record_list*, void(*fptr)(void*));
+void print_keys(record_list*, void(*fptr)(void*));
 
 
 /******
  * 	Functions
  *****/
 
+
+/* ***
+ * 	get_type deciphers the type which is pointed to by void* n
+ * 	returns IS_INT, IS_FLOAT, or IS_STRING
+ * 	ints, floats, and strings (char* 's) are all we're concerned about for
+ * 	this project.
+ ****/
+int get_type(void* n)
+{
+	return 69;	
+}
 
 /* ***
  * 	push() pushes data "k"--in a new Record node--to the front of
@@ -73,13 +89,13 @@ void push(record_list** head_ref, void* k, size_t data_size)
 }
 
 /* ***
- * 	print_list() accepts a pointer to a record_list as first arg.
+ * 	print_keys() accepts a pointer to a record_list as first arg.
  * 	as second arg accepts one of the following:
  * 		"print_int" if your list contains integer values in key
  * 		"print_float" if your list contains float values in key
  * 		"print_str" if your list containt char* values in key
  * **/
-void print_list(record_list* head_ref, void(*fptr)(void*))
+void print_keys(record_list* head_ref, void(*fptr)(void*))
 {
 	Record* ptr = head_ref->first;
 	while(ptr)
@@ -99,8 +115,6 @@ void print_float(void* k)
 }
 void print_str(void* k)
 {
-	//char tmp[20];
-	//strcpy(tmp, (char*)k);
 	printf("%s ", (char*)k);
 }
 

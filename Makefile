@@ -5,3 +5,6 @@ compile: simpleCSVsorter.c simpleCSVsorter.h
 	#gcc simpleCSVsorter.c -o simpleCSVsorter
 clean:
 	rm simpleCSVsorter
+
+moves: simpleCSVsorter.c
+	cat movie_metadata.csv | ./simpleCSVsorter -c movie_title

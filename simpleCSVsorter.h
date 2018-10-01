@@ -3,6 +3,10 @@
 #include <unistd.h>
 #include <string.h>
 #include <ctype.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
 
 
 /*****
@@ -62,6 +66,28 @@ void print_keys(record_list*, void(*fptr)(void*));
  * 	Functions
  *****/
 
+// TEST READ FROM STDIN AND WRITE TO STDOUT
+void readCSV()
+{
+	char* buffer = (char*)malloc(500);
+	if(buffer == NULL)
+	{
+		printf("PANIC!\n");
+		return;
+	}
+	int count_lines = 0;
+	while(read(STDIN, buffer, 1) != 0)
+        {
+		if(strcmp(buffer, "\n") == 0)
+			count_lines++;
+		else
+			continue;
+                //write(STDOUT, buffer, 1);
+        }
+	printf("number of lines in CSV: %d\n", count_lines);
+        free(buffer);
+	return;
+}
 
 /* ***
  * 	get_type deciphers the type which is pointed to by void* n

@@ -3,6 +3,10 @@
 #include <unistd.h>
 #include <string.h>
 #include <ctype.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
 #include "simpleCSVsorter.h"
 
 /* ***
@@ -32,7 +36,10 @@ int main(int argc, char** argv)
 		key_type = argv[2];
 		printf("key_type: %s\n", key_type);
 	}
-	
+
+
+	// TEST READ FROM STDIN
+	readCSV();
 	
 	// TESTING PUSH AND PRINT
 	int arr[] = {10, 20, 30, 40, 50};

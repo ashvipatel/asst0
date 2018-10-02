@@ -39,6 +39,7 @@ int main(int argc, char** argv)
 	// TEST READ FROM STDIN
 	if(readCSV(&head) == -1)
 		return -1;
+	print_list(head);
 	clear(head);
 	return 1;
 }

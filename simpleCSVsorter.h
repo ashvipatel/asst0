@@ -19,7 +19,6 @@ typedef enum _boolean { TRUE = 1, FALSE = 0} boolean;
 typedef struct _Record
 {
 	void* key;
-
 	char* complete;
 	struct _Record* next;
 } Record;
@@ -42,9 +41,10 @@ typedef struct _record_list
 // pointed to by a void*
 char* sort_token;
 int sort_token_index = 0;
-#define IS_INT 0
-#define IS_FLOAT 1
-#define IS_STRING 2
+int type;
+#define INT 0
+#define FLOAT 1
+#define STRING 2
 boolean integer = FALSE;
 boolean string = FALSE;
 boolean floating = FALSE;
@@ -64,6 +64,7 @@ int TOKEN_SIZE = 200;
  *
  ******/
 void clear(record_list*);
+void* get_key(char*);
 int get_token_index(char*);
 int get_type(void*);
 Record* push_new_record(record_list**);
@@ -91,11 +92,39 @@ void clear(record_list* head_ref)
 }
 
 
-
-void* get_key(char* a)
+/* ***
+ *	get_key(char* s) parses the string pointed to by s,
+ *	calls get_type(void*) to determine the type of data referenced by key
+ *	then allocates the appropriate memory for void* k
+ *	and returns k
+ ****/
+void* get_key(char* s)
 {
 	void* k;
-	k = a;
+
+	int a = 5;
+	k = &a;
+
+	int index = 0;
+	//boolean in_quotes = FALSE;
+	char* str = (char*)malloc(strlen(s));
+	str = strcpy(str, s);
+	int i = 0;
+	while(strcmp(&str[i],"\n") != 0)
+	{
+		if(index == sort_token_index)
+		{ // FOUND KEY INDEX! 
+			
+			return k;
+		}
+		if(strcmp(&str[i],"\"") == 0)
+		{
+			//in_quotes = TRUE;
+			i++;
+		}
+			
+	}
+	free(str);
 	return k;
 }
 
@@ -188,32 +217,36 @@ int readCSV(record_list** head_ref)
 		printf("Fatal Error in %s on line %d\nSort Token not found in CSV\n", __FILE__, __LINE__);
 		return -1;
 	}
-	else
-
 	// READ THE BODY OF THE CSV
 	//Record* tmp_record;
+	int eof;
 	do
 	{
 		Record* tmp = push_new_record(head_ref);
-		read(STDIN, buffer, 1);
 		line_len = strlen(tmp->complete);
-		if(line_len < LINE_SIZE)
+		do
 		{
-			// append buffer to new Record's complete string
-			tmp->complete = strcat(tmp->complete, buffer);
-		}
-		else // line_len exceeds memory allocated for new Record's complete string
-		{
-			LINE_SIZE += (LINE_SIZE/2);
-			tmp->complete = (char*)realloc(tmp->complete, LINE_SIZE);
-			tmp->complete = strcat(tmp->complete, buffer);
-		}
+			eof = read(STDIN, buffer, 1);
+			if(eof == 0)
+				break;
+
+			if(line_len < LINE_SIZE)
+			{
+				// append buffer to new Record's complete string
+				tmp->complete = strcat(tmp->complete, buffer);
+			}
+			else // line_len exceeds memory allocated for new Record's complete string
+			{
+				LINE_SIZE += (LINE_SIZE/2);
+				tmp->complete = (char*)realloc(tmp->complete, LINE_SIZE);
+				tmp->complete = strcat(tmp->complete, buffer);
+			}
 		} while(strcmp(buffer, "\n") != 0);
 		// Reached end of a line in CSV.
 		// get key for line and continue to next line.
-		get_key(tmp);
+		//tmp->key = get_key(tmp);
 
-	} while(read(STDIN, buffer, 1) != 0);
+	} while(eof != 0);
         	
 	printf("number of lines in CSV: %d\n", count_lines);
         free(buffer);
@@ -276,7 +309,16 @@ void print_str(void* k)
 }
 
 
-
+void print_list(record_list* head)
+{
+	printf("%s", head->col_tokens);
+	Record* curr = head->first;
+	while(curr)
+	{
+		printf("%s", curr->complete);
+		curr = curr->next;
+	}
+}
 
 
 

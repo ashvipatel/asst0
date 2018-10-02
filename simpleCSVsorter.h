@@ -19,6 +19,7 @@ typedef enum _boolean { TRUE = 1, FALSE = 0} boolean;
 typedef struct _Record
 {
 	void* key;
+
 	char* complete;
 	struct _Record* next;
 } Record;
@@ -65,7 +66,7 @@ int TOKEN_SIZE = 200;
 void clear(record_list*);
 int get_token_index(char*);
 int get_type(void*);
-void push_record(record_list**, void*, size_t);
+Record* push_new_record(record_list**);
 void print_float(void*);
 void print_int(void*);
 void print_keys(record_list*, void(*fptr)(void*));
@@ -89,10 +90,14 @@ void clear(record_list* head_ref)
 	// then free the record node
 }
 
-/* ***
- *	get_key(char* str) parses through the string....
- *	DO I NEED THIS?
- ****/
+
+
+void* get_key(char* a)
+{
+	void* k;
+	k = a;
+	return k;
+}
 
 
 /* ***
@@ -145,14 +150,17 @@ int readCSV(record_list** head_ref)
 	char* buffer = (char*)malloc(BUFFER_SIZE);
 	(*head_ref)->col_tokens = (char*)malloc(LINE_SIZE);
 	int line_len = strlen((*head_ref)->col_tokens);
-		if(buffer == NULL)
+
+	if(buffer == NULL)
 	{
 		printf("Fatal Error in %s on line %d\nUnable to Allocate Memory for Buffer\n", __FILE__, __LINE__);
 		return -1;
 	}
 
 	int count_lines = 0;
-	// read first line of CSV to get column tokens
+	
+
+	// READ THE HEADER OF THE CSV TO GET COL TOKENS
 	do
 	{
 		read(STDIN, buffer, 1);
@@ -181,13 +189,32 @@ int readCSV(record_list** head_ref)
 		return -1;
 	}
 	else
-	while(read(STDIN, buffer, 1) != 0)
-        {
-		if(strcmp(buffer, "\n") == 0)
-			count_lines++;
-		else
-			continue;
-        }
+
+	// READ THE BODY OF THE CSV
+	//Record* tmp_record;
+	do
+	{
+		Record* tmp = push_new_record(head_ref);
+		read(STDIN, buffer, 1);
+		line_len = strlen(tmp->complete);
+		if(line_len < LINE_SIZE)
+		{
+			// append buffer to new Record's complete string
+			tmp->complete = strcat(tmp->complete, buffer);
+		}
+		else // line_len exceeds memory allocated for new Record's complete string
+		{
+			LINE_SIZE += (LINE_SIZE/2);
+			tmp->complete = (char*)realloc(tmp->complete, LINE_SIZE);
+			tmp->complete = strcat(tmp->complete, buffer);
+		}
+		} while(strcmp(buffer, "\n") != 0);
+		// Reached end of a line in CSV.
+		// get key for line and continue to next line.
+		get_key(tmp);
+
+	} while(read(STDIN, buffer, 1) != 0);
+        	
 	printf("number of lines in CSV: %d\n", count_lines);
         free(buffer);
 	return 1;
@@ -209,15 +236,13 @@ int get_type(void* n)
  * 	push_record() pushes data "k"--in a new Record node--to the front of
  * 	the record_list referenced by head_ref
  ***/
-void push_record(record_list** head_ref, void* k, size_t data_size)
+Record* push_new_record(record_list** head_ref)
 {
 	Record* new_node = (Record*)malloc(sizeof(Record));
-	// note to self: DON'T FORGET TO FREE THE KEY FOR EACH RECORD NODE
-	new_node->key = malloc(data_size);
-	new_node->key = k;
+	new_node->complete = (char*)malloc(LINE_SIZE);
 	new_node->next = (*head_ref)->first;
-
 	(*head_ref)->first = new_node;
+	return new_node;
 }
 
 /* ***
